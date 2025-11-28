@@ -123,12 +123,40 @@ def avaliar_modelo(model, X_test_scaled, y_test, history=None):
     print("RELATÓRIO DE CLASSIFICAÇÃO")
     print("="*50)
     print(classification_report(y_test, y_pred))
+    
+    # Acurácia adicional no relatório
+    from sklearn.metrics import accuracy_score
+    accuracy_manual = accuracy_score(y_test, y_pred)
+    print(f"Acurácia: {accuracy_manual:.4f}")
 
     auc_roc = roc_auc_score(y_test, y_pred_proba)
     print(f"AUC-ROC: {auc_roc:.4f}")
 
     plt.figure(figsize=(18, 12))
 
+    # Gráfico 1: Curva de Aprendizado - Acurácia
+    if history is not None:
+        plt.subplot(2, 3, 1)
+        plt.plot(history.history['accuracy'], label='Acurácia Treino', linewidth=2)
+        plt.plot(history.history['val_accuracy'], label='Acurácia Validação', linewidth=2)
+        plt.title('Curva de Aprendizado - Acurácia', fontsize=14, fontweight='bold')
+        plt.xlabel('Época', fontsize=12)
+        plt.ylabel('Acurácia', fontsize=12)
+        plt.legend(fontsize=10)
+        plt.grid(True, alpha=0.3)
+
+    # Gráfico 2: Curva de Aprendizado - Loss
+    if history is not None:
+        plt.subplot(2, 3, 2)
+        plt.plot(history.history['loss'], label='Loss Treino', linewidth=2)
+        plt.plot(history.history['val_loss'], label='Loss Validação', linewidth=2)
+        plt.title('Curva de Aprendizado - Loss', fontsize=14, fontweight='bold')
+        plt.xlabel('Época', fontsize=12)
+        plt.ylabel('Loss', fontsize=12)
+        plt.legend(fontsize=10)
+        plt.grid(True, alpha=0.3)
+
+    # Gráfico 3: Matriz de Confusão
     plt.subplot(2, 3, 3)
     cm = confusion_matrix(y_test, y_pred)
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
@@ -136,6 +164,7 @@ def avaliar_modelo(model, X_test_scaled, y_test, history=None):
     plt.xlabel('Predito', fontsize=12)
     plt.ylabel('Real', fontsize=12)
 
+    # Gráfico 4: Curva ROC
     plt.subplot(2, 3, 4)
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
     plt.plot(fpr, tpr, label=f'ROC Curve (AUC = {auc_roc:.4f})', linewidth=2, color='red')
@@ -146,6 +175,7 @@ def avaliar_modelo(model, X_test_scaled, y_test, history=None):
     plt.legend(fontsize=10)
     plt.grid(True, alpha=0.3)
 
+    # Gráfico 5: Distribuição das Probabilidades
     plt.subplot(2, 3, 5)
     plt.hist(y_pred_proba[y_test == 0], alpha=0.7, label='Não Diabético', bins=20, color='blue', edgecolor='black')
     plt.hist(y_pred_proba[y_test == 1], alpha=0.7, label='Diabético', bins=20, color='red', edgecolor='black')
@@ -155,6 +185,7 @@ def avaliar_modelo(model, X_test_scaled, y_test, history=None):
     plt.legend(fontsize=10)
     plt.grid(True, alpha=0.3)
 
+    # Gráfico 6: Importância das Features
     plt.subplot(2, 3, 6)
     first_layer_weights = np.abs(model.layers[0].get_weights()[0])
     feature_importance = np.mean(first_layer_weights, axis=1)
