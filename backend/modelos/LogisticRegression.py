@@ -17,7 +17,7 @@ def criar_novo_modelo_regressao():
     diretorio_atual = os.path.dirname(os.path.abspath(__file__))
     caminho_arquivo = os.path.join(diretorio_atual, '..', 'datasets', 'diabetes_dataset.csv')
     df = pd.read_csv(caminho_arquivo)
-    
+    print("TEste")
     print("\nPrimeiras linhas do dataset:")
     print(df.head())
     
